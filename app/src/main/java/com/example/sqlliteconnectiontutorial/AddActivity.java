@@ -17,10 +17,10 @@ public class AddActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add);
 
-        edTitle = findViewById(R.id.edTitleInput);
-        edAuthor = findViewById(R.id.edAuthorInput);
-        edPages = findViewById(R.id.edNumOfPaperInput);
-        btnAdd = findViewById(R.id.btnSave);
+        edTitle = findViewById(R.id.edTitleInputUpdate);
+        edAuthor = findViewById(R.id.edAuthorInputUpdate);
+        edPages = findViewById(R.id.edNumOfPaperInputUpdate);
+        btnAdd = findViewById(R.id.btnUpdate);
 
         btnAdd.setOnClickListener(new View.OnClickListener() {
             @Override

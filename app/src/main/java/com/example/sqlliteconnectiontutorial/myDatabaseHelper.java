@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.DatabaseErrorHandler;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -24,7 +25,7 @@ class myDatabaseHelper extends SQLiteOpenHelper {
     private static final String COLUMN_PAGES = "book_pages";
 
 
-    public myDatabaseHelper(@Nullable Context context) {
+    myDatabaseHelper(@Nullable Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
         this.context = context;
     }
@@ -37,7 +38,7 @@ class myDatabaseHelper extends SQLiteOpenHelper {
                         COLUMN_TITLE + " TEXT, " +
                         COLUMN_AUTHOR + " TEXT, "+
                         COLUMN_PAGES + " INTEGER);";
-        db.execSQL(query) ;
+        db.execSQL(query);
     }
 
     @Override
@@ -71,5 +72,21 @@ class myDatabaseHelper extends SQLiteOpenHelper {
             cursor = db.rawQuery(query, null);
         }
         return cursor;
+    }
+
+    void updateData (String row_id, String title, String author, String pages) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        Log.d("DATA PASSING", "title: "+title + " author: "+author);
+        cv.put(COLUMN_TITLE, title);
+        cv.put(COLUMN_AUTHOR, author);
+        cv.put(COLUMN_PAGES, pages);
+
+        long result = db.update(TABLE_NAME, cv, "_id=?", new String[]{row_id});
+        if(result == -1){
+            Toast.makeText(context, "Failed to update", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(context, "Successfully Updated.", Toast.LENGTH_SHORT).show();
+        }
     }
 }
