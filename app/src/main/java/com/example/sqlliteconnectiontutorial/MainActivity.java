@@ -1,14 +1,22 @@
 package com.example.sqlliteconnectiontutorial;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -19,6 +27,8 @@ public class MainActivity extends AppCompatActivity {
 
     RecyclerView recyclerView;
     FloatingActionButton addBtn;
+    ImageView imgEmpty;
+    TextView txtNoData;
 
     myDatabaseHelper myDB;
     ArrayList<String> book_id, book_title, book_author, book_pages;
@@ -30,6 +40,8 @@ public class MainActivity extends AppCompatActivity {
 
         recyclerView = findViewById(R.id.recycleView);
         addBtn = findViewById(R.id.addBtn);
+        imgEmpty = findViewById(R.id.imgEmpty);
+        txtNoData = findViewById(R.id.txtNoData);
 
         addBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -65,7 +77,8 @@ public class MainActivity extends AppCompatActivity {
         Cursor cursor = myDB.readAllData();
         try{
             if(cursor.getCount() == 0) {
-                Toast.makeText(this, "No Data.", Toast.LENGTH_SHORT).show();
+                imgEmpty.setVisibility(View.VISIBLE);
+                txtNoData.setVisibility(View.VISIBLE);
             } else {
                 while(cursor.moveToNext()){
                     //collumn index.
@@ -73,13 +86,52 @@ public class MainActivity extends AppCompatActivity {
                     book_title.add(cursor.getString(1));
                     book_author.add(cursor.getString(2));
                     book_pages.add(cursor.getString(3));
-
                 }
+                imgEmpty.setVisibility(View.GONE);
+                txtNoData.setVisibility(View.GONE);
             }
         }
-        catch (Exception ex){
+        catch (Exception ex) {
             Toast.makeText(this, "Something wrong.", Toast.LENGTH_SHORT).show();
         }
-       
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.my_menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if(item.getItemId() == R.id.delete_all){
+            confirmDialog();
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    void confirmDialog(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Delete All?");
+        builder.setMessage("Are you sure you want to delete all data ?");
+        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                myDatabaseHelper myDB = new myDatabaseHelper(MainActivity.this);
+                myDB.deleteAllData();
+                //Refresh Activity, but maybe I could use loading page at this moment.
+                Intent intent = new Intent(MainActivity.this, MainActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        });
+        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+        builder.create().show();
     }
 }
